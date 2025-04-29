@@ -14,8 +14,30 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+            
+            Button("Run Terminal Command") {
+                self.runTerminalCommand()
+            }
         }
         .padding()
+    }
+    
+    private func runTerminalCommand() {
+        let command = "/bin/ls -l" // replace with any command
+        let task = Process()
+        
+        task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        
+        task.arguments = ["-c", command]
+        
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.launch()
+        task.waitUntilExit()
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8) ?? ""
+        print(output)
     }
 }
 
